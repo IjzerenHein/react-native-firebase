@@ -39,6 +39,22 @@ RCT_EXPORT_METHOD(setUserIdentifier:(NSString *)userId) {
     [CrashlyticsKit setUserIdentifier:userId];
 }
 
+RCT_EXPORT_METHOD(recordCustomExceptionName:(nonnull NSString *)name reason:(NSString *)reason frameArray:(nonnull NSArray *)frameArray)
+{
+  NSMutableArray *clsFrames = [[NSMutableArray alloc] init];
+  if(frameArray) {
+    for (NSDictionary *dict in frameArray) {
+      CLSStackFrame *frame = [CLSStackFrame stackFrame];
+      [frame setFileName: dict[@"fileName"]];
+      [frame setLineNumber: [dict[@"lineNumber"] intValue]];
+      [frame setOffset: [dict[@"columnNumber"] intValue]];
+      [frame setSymbol: dict[@"functionName"]];
+      [clsFrames addObject: frame];
+    }
+    [CrashlyticsKit recordCustomExceptionName:name reason:reason frameArray:clsFrames];
+  }
+}
+
 @end
 
 #else
